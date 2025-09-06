@@ -1,4 +1,4 @@
-# log-analyser
+# Log Analyser
 
 A Typer-based CLI application that analyzes logs based on trace IDs (DB mode). This tool is specifically designed to analyze logs following a structured pattern with trace IDs, span IDs, and contextual information.
 
@@ -80,6 +80,7 @@ log-analyser list-duplicate-queries logs/db.log trace123 trace456 --format yaml
 For comprehensive command documentation, options, and advanced usage examples, see:
 
 - **[COMMANDS.md](docs/COMMANDS.md)** - Complete command reference with detailed options and examples
+- **[EXTENSIONS.md](docs/EXTENSIONS.md)** - Required VS Code extensions for optimal development experience
 - **[Makefile](Makefile)** - Available make commands for development and deployment
 
 ## Key Features
