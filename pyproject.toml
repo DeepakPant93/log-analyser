@@ -1,0 +1,31 @@
+[project]
+name = "log-analyser"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "typer[all]~=0.12.5",
+    "click~=8.1.8",
+    "pyyaml~=6.0.2",
+    "tabulate~=0.9.0",
+]
+
+[project.scripts]
+log-analyser = "log_analyser.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 120
+select = [
+  "E",  # pycodestyle errors (PEP 8)
+  "F",  # pyflakes (errors like unused imports)
+  "I",  # isort (import sorting)
+  "B",  # flake8-bugbear (common bugs)
+  "C",  # flake8-comprehensions (better list/dict comprehensions)
+]
+ignore = [] # Add specific rules to ignore if needed, e.g., ["E501"] for line length
+target-version = "py312" # Adjust to your Python version, e.g.

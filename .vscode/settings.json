@@ -1,0 +1,78 @@
+{
+    // Ruff settings
+    "python.linting.enabled": true,
+    "python.linting.ruffEnabled": true,
+    "python.linting.ruffArgs": ["--fix"],
+    "[python]": {
+      "editor.defaultFormatter": "astral-sh.ruff",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.organizeImports": "never"
+      }
+    },
+    // Markdown All in One settings
+    "[markdown]": {
+      "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+      "editor.formatOnSave": true,
+      "editor.quickSuggestions": {
+        "comments": true,
+        "strings": true,
+        "other": true
+      },
+      "editor.wordWrap": "on"
+    },
+    "markdown.preview.scrollEditorWithPreview": true,
+    "markdown.preview.scrollPreviewWithEditor": true,
+    // File explorer exclusions
+    "files.exclude": {
+      "**/.venv": true,
+      "**/.ruff_cache": true,
+      "**/__pycache__": true,
+      "**/*.pyc": true,
+      "**/*.pyo": true,
+      "**/*.pyd": true,
+      "**/.Python": true,
+      "**/pip-log.txt": true,
+      "**/pip-delete-this-directory.txt": true,
+      "**/.pytest_cache": true,
+      "**/.coverage": true,
+      "**/.mypy_cache": true,
+      "**/.tox": true,
+      "**/.nox": true,
+      "**/htmlcov": true,
+      "**/.hypothesis": true,
+      "**/.eggs": true,
+      "**/dist": true,
+      "**/build": true,
+      "**/*.egg-info": true
+    },
+    // Makefile Tools settings (optional)
+    "makefile.extensionOutputFolder": "./.vscode",
+    // Debug configurations
+    "launch": {
+      "version": "0.2.0",
+      "configurations": [
+        {
+          "name": "Debug Log Analyser",
+          "type": "debugpy",
+          "request": "launch",
+          "program": "${workspaceFolder}/src/log_analyser/cli.py",
+          "args": "${input:command}",
+          "console": "integratedTerminal",
+          "cwd": "${workspaceFolder}",
+          "env": {
+            "PYTHONPATH": "${workspaceFolder}/src"
+          },
+          "justMyCode": false
+        }
+      ],
+      "inputs": [
+        {
+          "id": "command",
+          "description": "Enter full command arguments (space-separated)",
+          "default": "analyse logs/db.log 'traceId' --format table",
+          "type": "promptString"
+        }
+      ]
+    }
+  }

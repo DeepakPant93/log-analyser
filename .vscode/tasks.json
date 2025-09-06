@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Run Ruff Lint",
+        "type": "shell",
+        "command": "make lint",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Run Tests",
+        "type": "shell",
+        "command": "make test",
+        "group": "test",
+        "problemMatcher": []
+      }
+    ]
+  }
