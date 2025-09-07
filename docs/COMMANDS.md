@@ -38,7 +38,7 @@ log-analyser analyse <log_file> <trace_ids> [OPTIONS]
 
 **Options** (Optional):
 - `--mode`: Analysis mode (default: "DB", currently only DB mode is supported)
-- `--slow-ms`: Threshold for slow queries in milliseconds (default: 100.0)
+- `--slow-ms`: Threshold for slow queries in milliseconds (default: 500.0)
 - `--format`: Output format - table, json, or yaml (default: table)
 - `--output-file`: Save output to file (optional)
 
@@ -74,6 +74,8 @@ log-analyser list-queries logs/db.log "trace-123" --format table --output-file q
 ```
 
 **Output**: Detailed list of all queries with timestamp, trace ID, duration, statement, and error status.
+
+**Note**: If duration or rows shows as -1, it means that statistical information (time/rows) is not available for that particular query in the log format.
 
 ---
 

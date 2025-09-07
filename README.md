@@ -95,7 +95,7 @@ For comprehensive command documentation, options, and advanced usage examples, s
 ## Configuration
 
 - **Default Mode**: DB (database log analysis)
-- **Slow Query Threshold**: 100ms (customizable with `--slow-ms`)
+- **Slow Query Threshold**: 500ms (customizable with `--slow-ms`)
 - **Output Formats**: table (default), json, yaml
 - **File Output**: Use `--output-file` to save results to a file
 

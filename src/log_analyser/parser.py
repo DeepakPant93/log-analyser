@@ -15,15 +15,22 @@ TIMESTAMP_REGEXPS = [
 ]
 
 # Hibernate SQL log patterns:
-# DEBUG org.hibernate.SQL - select session0_.id as id1_34_...
-# INFO org.hibernate.SQL_SLOW - SlowQuery: 3 milliseconds. SQL: 'com.mysql.cj.jdbc...'
-DB_QUERY_REGEX = re.compile(
+# Type 1: DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: select ..., time: 20ms, rows: 38
+# Type 2: DEBUG org.hibernate.SQL - select session0_.id as id1_34_...
+# Type 3: INFO org.hibernate.SQL_SLOW - SlowQuery: 11854 milliseconds. SQL: 'com.mysql.cj.jdbc...'
+DB_QUERY_WITH_STATS_REGEX = re.compile(
+    r"DEBUG\s+o\.h\.stat\.internal\.StatisticsImpl\s+-\s+HHH000117:\s+HQL:\s+"
+    r"(?P<stmt>.+?),\s+time:\s+(?P<dur>[0-9.]+)ms,\s+rows:\s+(?P<rows>[0-9]+)$",
+    re.IGNORECASE,
+)
+
+DB_QUERY_WITHOUT_STATS_REGEX = re.compile(
     r"DEBUG\s+org\.hibernate\.SQL\s+-\s+(?P<stmt>.+)$",
     re.IGNORECASE,
 )
 
 SLOW_QUERY_REGEX = re.compile(
-    r"INFO\s+org\.hibernate\.SQL_SLOW\s+-\s+SlowQuery:\s+(?P<dur>[0-9.]+)\s+milliseconds\.\s+SQL:\s+'(?P<stmt>.+)'$",
+    r"INFO\s+org\.hibernate\.SQL_SLOW\s+-\s+SlowQuery:\s+(?P<dur>[0-9.]+)\s+milliseconds\.\s+SQL:\s+'com\.mysql\.cj\.jdbc\.ClientPreparedStatement:\s*(?P<stmt>.+)'$",
     re.IGNORECASE,
 )
 
@@ -56,7 +63,7 @@ def _parse_timestamp(line: str) -> datetime | None:
     return None
 
 
-def parse_db_mode(log_file: str, trace_ids: List[str], slow_ms: float = 100.0) -> AnalysisResult:
+def parse_db_mode(log_file: str, trace_ids: List[str], slow_ms: float = 500.0) -> AnalysisResult:
     path = Path(log_file)
     if not path.exists():
         raise FileNotFoundError(f"Log file not found: {log_file}")
@@ -77,17 +84,35 @@ def parse_db_mode(log_file: str, trace_ids: List[str], slow_ms: float = 100.0) -
             if is_error:
                 errors_by_trace[trace_id] = True
 
-            # Check for regular SQL queries (DEBUG org.hibernate.SQL)
-            db_match = DB_QUERY_REGEX.search(line)
-            if db_match:
-                stmt = db_match.group("stmt").strip()
-                # For regular queries, we don't have duration info, so set to 0
+            # Check for Type 1 SQL queries with stats (DEBUG o.h.stat.internal.StatisticsImpl)
+            db_stats_match = DB_QUERY_WITH_STATS_REGEX.search(line)
+            if db_stats_match:
+                stmt = db_stats_match.group("stmt").strip()
+                duration_ms = float(db_stats_match.group("dur"))
+                rows = int(db_stats_match.group("rows"))
                 queries.append(
                     DbQuery(
                         timestamp=ts or datetime.min,
                         trace_id=trace_id,
                         statement=stmt,
-                        duration_ms=0.0,
+                        duration_ms=duration_ms,
+                        rows=rows,
+                        is_error=is_error,
+                    )
+                )
+                continue
+
+            # Check for Type 2 SQL queries without stats (DEBUG org.hibernate.SQL)
+            db_no_stats_match = DB_QUERY_WITHOUT_STATS_REGEX.search(line)
+            if db_no_stats_match:
+                stmt = db_no_stats_match.group("stmt").strip()
+                queries.append(
+                    DbQuery(
+                        timestamp=ts or datetime.min,
+                        trace_id=trace_id,
+                        statement=stmt,
+                        duration_ms=-1.0,  # No duration info available
+                        rows=-1,  # No rows info available
                         is_error=is_error,
                     )
                 )
@@ -104,6 +129,7 @@ def parse_db_mode(log_file: str, trace_ids: List[str], slow_ms: float = 100.0) -
                         trace_id=trace_id,
                         statement=stmt,
                         duration_ms=duration_ms,
+                        rows=-1,  # Slow queries don't have rows information
                         is_error=is_error,
                     )
                 )

@@ -19,6 +19,7 @@ class DbQuery:
     trace_id: str
     statement: str
     duration_ms: float
+    rows: int = -1
     is_error: bool = False
 
 

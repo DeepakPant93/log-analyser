@@ -26,7 +26,7 @@ def analyze(
     log_file: str = typer.Argument(..., help=HELP_LOG_FILE),
     trace_ids: str = typer.Argument(..., help=HELP_TRACE_IDS),
     mode: str = typer.Option("DB", "--mode", case_sensitive=False, help="Analysis mode (DB)"),
-    slow_ms: float = typer.Option(100.0, "--slow-ms", help="Threshold for slow queries in ms"),
+    slow_ms: float = typer.Option(500.0, "--slow-ms", help="Threshold for slow queries in ms"),
     format: str = typer.Option(OutputFormat.TABLE.value, "--format", help=HELP_OUTPUT_FORMAT),
     output_file: Optional[str] = typer.Option(None, "--output-file", help=HELP_OUTPUT_FILE),
 ):
@@ -68,6 +68,7 @@ def list_queries(
             "timestamp": q.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
             "trace_id": q.trace_id,
             "duration_ms": q.duration_ms,
+            "rows": q.rows,
             "statement": q.statement,
             "is_error": q.is_error,
         }
@@ -82,7 +83,7 @@ def list_queries(
 def list_slow_queries(
     log_file: str = typer.Argument(..., help=HELP_LOG_FILE),
     trace_ids: str = typer.Argument(..., help=HELP_TRACE_IDS),
-    slow_ms: float = typer.Option(100.0, "--slow-ms", help="Threshold for slow queries in ms"),
+    slow_ms: float = typer.Option(500.0, "--slow-ms", help="Threshold for slow queries in ms"),
     format: str = typer.Option(OutputFormat.TABLE.value, "--format", help=HELP_OUTPUT_FORMAT),
     output_file: Optional[str] = typer.Option(None, "--output-file", help=HELP_OUTPUT_FILE),
 ):
